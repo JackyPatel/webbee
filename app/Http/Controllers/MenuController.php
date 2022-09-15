@@ -94,6 +94,14 @@ class MenuController extends BaseController
      */
 
     public function getMenuItems() {
-        throw new \Exception('implement in coding task 3');
+        $uniqueParentIds = MenuItem::whereNotNull('parent_id')->pluck('parent_id')->unique()->toArray();
+        $data = MenuItem::with('children')->get();
+        $temp = [];
+        foreach($data as $key => $record) {
+            if(!in_array($record['parent_id'], $uniqueParentIds) || $record['parent_id'] == null) {
+                $temp[] = $record;
+            }
+        }
+        return $temp;
     }
 }
