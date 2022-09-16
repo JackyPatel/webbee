@@ -37,7 +37,58 @@ class CreateCinemaSchema extends Migration
      */
     public function up()
     {
-        throw new \Exception('implement in coding task 4, you can ignore this exception if you are just running the initial migrations.');
+        Schema::create('movies', function (Blueprint $table) {
+            $table->increments('id');
+            $table->text('title');
+            $table->text('poster');
+            $table->enum('type',['Action', 'Drama', 'Comedy'])->nullable();
+            $table->enum('language',['Gujarati', 'Hindi', 'English'])->nullable();
+            $table->date('release_date');
+            $table->longText('description');
+            $table->double('duration');
+            $table->timestamps();
+        });
+
+        Schema::create('movie_casts', function (Blueprint $table) {
+            $table->increments('id');
+            $table->text('profile_image');
+            $table->text('name');
+            $table->text('role');
+            $table->integer('movie_id')->unsigned();
+            $table->foreign('movie_id')->references('id')->on('movies')->onDelete('cascade');
+            $table->timestamps();
+        });
+
+        Schema::create('movie_shows', function (Blueprint $table) {
+            $table->increments('id');
+            $table->integer('movie_id')->unsigned();
+            $table->foreign('movie_id')->references('id')->on('movies')->onDelete('cascade');
+            $table->text('screen');
+            $table->date('date');
+            $table->time('time');
+            $table->timestamps();
+        });
+
+        Schema::create('show_seats', function (Blueprint $table) {
+            $table->increments('id');
+            $table->integer('movie_shows_id')->unsigned();
+            $table->foreign('movie_shows_id')->references('id')->on('movie_shows')->onDelete('cascade');
+            $table->enum('type',['PLATINUM', 'GOLD', 'SILVER']);
+            $table->double('price',[5,2]);
+            $table->integer('seat_count');
+            $table->timestamps();
+        });
+
+        Schema::create('show_booking', function (Blueprint $table) {
+            $table->increments('id');
+            $table->integer('movie_shows_id')->unsigned();
+            $table->foreign('movie_shows_id')->references('id')->on('movie_shows')->onDelete('cascade');
+            $table->integer('user_id');
+            $table->integer('show_seats_id')->unsigned();
+            $table->foreign('show_seats_id')->references('id')->on('show_seats')->onDelete('cascade');
+            $table->double('paid_amount',[5,2]);
+            $table->timestamps();
+        });
     }
 
     /**
